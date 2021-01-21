@@ -7,45 +7,55 @@ window.addEventListener('resize', function () {
     selectCanvas.height = window.innerHeight;
     init()
 })
-let mouseClick={x: undefined, y:undefined}
+let mouseClick = { x: undefined, y: undefined }
 window.addEventListener('click', function (e) {
-    mouseClick.x=e.x;
-    mouseClick.y=e.y;
-init()
-
+    mouseClick.x = e.x;
+    mouseClick.y = e.y;
+    init()
     animation()
 })
 class CircularMotion {
-    constructor(x, y, raduis, color) {
+    constructor(x, y, raduis, angle, color) {
         this.x = x;
         this.y = y;
         this.raduis = raduis;
-        this.color = color
+        this.angle = angle;
+        this.color = color;
     }
     drawing() {
         canvas.beginPath();
-        canvas.arc(this.x, this.y, this.raduis, 0 , Math.PI*2);
+        canvas.arc(this.x, this.y, this.raduis, 0, Math.PI * 2);
         canvas.fill();
         canvas.fillStyle = `${this.color}`;
         canvas.closePath()
     }
     moving() {
+        this.x += this.angle.x;
+        this.y += this.angle.y;
+        this.drawing()
     }
-    
+
 }
 
-let motion;
 let arr = [];
 let colors = ["#00bdff", "#4d39ce", "#088eff"];
 function init() {
-    // for (let i = 0; i < 130; i++) {
-        let angle = Math.random() * .05;
+    for (let i = 0; i < 100; i++) {
+        let angle = {
+            x: Math.cos(Math.PI * 2 *i/50) ,
+            y: Math.sin(Math.PI * 2*i/50) 
+        };
         let colorIndex = Math.floor(Math.random() * colors.length + 1)
-        motion = new CircularMotion(mouseClick.x,mouseClick.y, 20, 'red');
-    // }
+        let motion = new CircularMotion(mouseClick.x,
+            mouseClick.y,
+            10, angle, 'red');
+        arr.push(motion)
+    }
 }
 function animation() {
     requestAnimationFrame(animation);
     canvas.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
-    motion.drawing()
+    arr.forEach(element => {
+        element.moving()
+    });
 }
