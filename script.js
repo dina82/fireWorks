@@ -15,47 +15,59 @@ window.addEventListener('click', function (e) {
     animation()
 })
 class CircularMotion {
-    constructor(x, y, raduis, angle, color) {
+    constructor(x, y, raduis, velocity, color) {
         this.x = x;
         this.y = y;
         this.raduis = raduis;
-        this.angle = angle;
+        this.velocity = velocity;
         this.color = color;
+        this.opacity = 1;
     }
     drawing() {
+        canvas.save()
+        canvas.globalAlpha = this.opacity
         canvas.beginPath();
         canvas.arc(this.x, this.y, this.raduis, 0, Math.PI * 2);
+        canvas.fillStyle = this.color;
         canvas.fill();
-        canvas.fillStyle = `${this.color}`;
-        canvas.closePath()
+        canvas.closePath();
+        canvas.restore()
+
+
+
     }
     moving() {
-        this.x += this.angle.x;
-        this.y += this.angle.y;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y + .65;
         this.drawing()
+        this.opacity -= .005;
     }
-
 }
 
 let arr = [];
-let colors = ["#00bdff", "#4d39ce", "#088eff"];
 function init() {
-    for (let i = 0; i < 100; i++) {
-        let angle = {
-            x: Math.cos(Math.PI * 2 *i/50) ,
-            y: Math.sin(Math.PI * 2*i/50) 
+    for (let i = 0; i < 400; i++) {
+        let angle = Math.PI * 2 * i / 400;
+        let velocity = {
+            x: Math.cos(angle) * 10 * Math.random(),
+            y: Math.sin(angle) * 10 * Math.random()
         };
-        let colorIndex = Math.floor(Math.random() * colors.length + 1)
+        let color = `hsl(${Math.random() * 200}, 50%,50%)`;
         let motion = new CircularMotion(mouseClick.x,
             mouseClick.y,
-            10, angle, 'red');
+            5, velocity, color);
         arr.push(motion)
     }
 }
 function animation() {
     requestAnimationFrame(animation);
-    canvas.clearRect(0, 0, selectCanvas.width, selectCanvas.height);
+    canvas.fillStyle = 'rgba(0, 0, 0, .05)';
+    canvas.fillRect(0, 0, selectCanvas.width, selectCanvas.height);
     arr.forEach(element => {
-        element.moving()
+        if (element.opacity > 0) {
+            element.moving()
+        } else {
+            element.opacity = 0
+        }
     });
 }
